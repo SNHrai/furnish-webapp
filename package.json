@@ -1,5 +1,5 @@
 {
-    "name": "nextjs-mongo-template",
+    "name": "luxury-interior-design",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -45,6 +45,7 @@
         "cmdk": "^1.1.1",
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
+        "framer-motion": "^11.13.5",
         "input-otp": "^1.4.2",
         "lucide-react": "^0.516.0",
         "mongodb": "^6.6.0",
@@ -64,10 +65,14 @@
         "zod": "^3.25.67"
     },
     "devDependencies": {
+        "@types/node": "^22",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
         "autoprefixer": "^10.4.19",
         "globals": "^16.2.0",
         "postcss": "^8",
-        "tailwindcss": "^3.4.1"
+        "tailwindcss": "^3.4.1",
+        "typescript": "^5.7"
     },
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
