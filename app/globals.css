@@ -39,19 +39,6 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 10.6% 64.9%;
-    
-    /* Elegant Home Design System Variables */
-    --primary-navy: #1A365D;
-    --primary-charcoal: #2D3748;
-    --accent-gold: #D4AF37;
-    --accent-warm: #C05621;
-    --accent-sage: #68D391;
-    --accent-cream: #FFF8DC;
-    --elegant-white: #FFFFFF;
-    --light-gray: #F7FAFC;
-    --medium-gray: #EDF2F7;
-    --dark-gray: #2D3748;
-    --elegant-black: #1A202C;
   }
 
   .dark {
@@ -80,12 +67,11 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground font-body;
     scroll-behavior: smooth;
@@ -99,71 +85,48 @@
     background: #f1f1f1;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--accent-gold);
+    background: #D4AF37;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-warm);
+    background: #C05621;
   }
 }
 
 @layer components {
   /* Button Variants */
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-900 to-accent-warm text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:transform hover:-translate-y-1 shadow-elegant-md hover:shadow-elegant-lg;
+    @apply bg-gradient-to-r from-blue-900 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:transform hover:-translate-y-1 shadow-lg hover:shadow-xl;
   }
 
   .btn-secondary {
-    @apply bg-white text-primary-900 border-2 border-accent-gold px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-accent-gold hover:text-white hover:transform hover:-translate-y-1;
+    @apply bg-white text-blue-900 border-2 border-yellow-500 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-yellow-500 hover:text-white hover:transform hover:-translate-y-1;
   }
 
   .btn-luxury {
-    @apply bg-gradient-to-r from-accent-gold to-yellow-600 text-white px-8 py-4 rounded-xl font-accent font-medium text-lg relative overflow-hidden transition-all duration-300 hover:shadow-luxury;
-  }
-
-  .btn-luxury::before {
-    content: '';
-    @apply absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full transition-transform duration-1000;
-  }
-
-  .btn-luxury:hover::before {
-    @apply translate-x-full;
+    @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-8 py-4 rounded-xl font-accent font-medium text-lg relative overflow-hidden transition-all duration-300 hover:shadow-xl;
   }
 
   /* Card Variants */
   .card-elegant {
-    @apply bg-white rounded-2xl shadow-elegant-lg p-6 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-elegant-xl;
+    @apply bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl;
   }
 
   .card-portfolio {
-    @apply bg-white rounded-2xl overflow-hidden shadow-luxury transition-all duration-400 hover:transform hover:-translate-y-1 relative;
-  }
-
-  .card-portfolio::before {
-    content: '';
-    @apply absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent-gold to-accent-warm transform scale-x-0 transition-transform duration-300;
-  }
-
-  .card-portfolio:hover::before {
-    @apply transform scale-x-100;
+    @apply bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-400 hover:transform hover:-translate-y-1 relative;
   }
 
   .card-premium {
-    @apply bg-gradient-to-br from-white to-accent-cream border-2 border-accent-gold rounded-2xl relative overflow-hidden;
-  }
-
-  .card-premium::after {
-    content: 'PREMIUM';
-    @apply absolute top-3 right-0 bg-accent-gold text-white px-6 py-1 text-xs font-bold transform rotate-45 translate-x-4 -translate-y-1;
+    @apply bg-gradient-to-br from-white to-yellow-50 border-2 border-yellow-500 rounded-2xl relative overflow-hidden;
   }
 
   /* Form Elements */
   .form-input {
-    @apply w-full px-4 py-3 border-2 border-medium-gray rounded-xl font-body bg-white transition-all duration-300 focus:outline-none focus:border-accent-warm focus:ring-2 focus:ring-accent-warm/20 focus:transform focus:-translate-y-1;
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl font-body bg-white transition-all duration-300 focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100 focus:transform focus:-translate-y-1;
   }
 
   .form-select {
-    @apply appearance-none bg-white border-2 border-medium-gray rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-accent-warm focus:ring-2 focus:ring-accent-warm/20;
+    @apply appearance-none bg-white border-2 border-gray-200 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-orange-600 focus:ring-2 focus:ring-orange-100;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.75rem center;
     background-repeat: no-repeat;
@@ -186,7 +149,7 @@
 
   /* Special Components */
   .calculator-widget {
-    @apply bg-gradient-to-br from-white to-gray-50 border-2 border-yellow-500 rounded-2xl p-8 shadow-luxury;
+    @apply bg-gradient-to-br from-white to-gray-50 border-2 border-yellow-500 rounded-2xl p-8 shadow-lg;
   }
 
   .price-display {
@@ -217,7 +180,7 @@
   
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-accent-gold via-accent-warm to-accent-gold bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-yellow-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent;
   }
 
   /* Custom utilities */
