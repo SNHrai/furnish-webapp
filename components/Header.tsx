@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Home, Calculator, Briefcase, Phone, Info } from 'lucide-react'
+import { Menu, X, Home, Calculator, Briefcase, Phone, Info, BarChart3 } from 'lucide-react'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,6 +20,7 @@ export default function Header() {
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Calculator', href: '/calculator', icon: Calculator },
+    { name: 'Compare', href: '/comparison', icon: BarChart3 },
     { name: 'Services', href: '/services', icon: Briefcase },
     { name: 'About', href: '/about', icon: Info },
     { name: 'Contact', href: '/contact', icon: Phone },

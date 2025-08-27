@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { Calculator, Home, Palette, DollarSign, ArrowRight, Sparkles, Zap, TrendingUp, Check, Star } from 'lucide-react'
+import { Calculator, Home, Palette, IndianRupee, ArrowRight, Sparkles, Zap, TrendingUp, Check, Star, Download, Mail, Save, BarChart3 } from 'lucide-react'
+import { formatINR, formatINRRange, PRICING_CONSTANTS } from '@/lib/currency'
+import { QuotationFormData, QuotationCalculation, SavedQuotation } from '@/lib/types/quotation'
+import { QuotationStorageService, createDefaultClientInfo } from '@/lib/services/quotation-storage'
+import SaveQuotationModal from '@/components/modals/SaveQuotationModal'
+import EmailShareModal from '@/components/modals/EmailShareModal'
 
 export default function CalculatorPage() {
   const [step, setStep] = useState(1)
@@ -19,14 +25,29 @@ export default function CalculatorPage() {
     special: ''
   })
 
+  // Modal states
+  const [saveModalOpen, setSaveModalOpen] = useState(false)
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [savedQuotations, setSavedQuotations] = useState<SavedQuotation[]>([])
+
+  // Load saved quotations on component mount
+  useEffect(() => {
+    try {
+      const quotations = QuotationStorageService.getSaved()
+      setSavedQuotations(quotations)
+    } catch (error) {
+      console.error('Error loading saved quotations:', error)
+    }
+  }, [])
+
   const roomTypes = [
-    { id: 'living-room', name: 'Living Room', icon: '🛋️', basePrice: 15000, description: 'Complete living space transformation' },
-    { id: 'bedroom', name: 'Master Bedroom', icon: '🛏️', basePrice: 12000, description: 'Luxurious bedroom retreat' },
-    { id: 'kitchen', name: 'Kitchen', icon: '🍳', basePrice: 25000, description: 'Gourmet kitchen renovation' },
-    { id: 'bathroom', name: 'Bathroom', icon: '🛁', basePrice: 18000, description: 'Spa-like bathroom design' },
-    { id: 'dining', name: 'Dining Room', icon: '🍽️', basePrice: 10000, description: 'Elegant dining experience' },
-    { id: 'office', name: 'Home Office', icon: '💻', basePrice: 8000, description: 'Productive workspace design' },
-    { id: 'whole-home', name: 'Whole Home', icon: '🏡', basePrice: 80000, description: 'Complete home makeover' },
+    { id: 'living-room', name: 'Living Room', icon: '🛋️', basePrice: PRICING_CONSTANTS.ROOM_PRICES.LIVING_ROOM, description: 'Complete living space transformation' },
+    { id: 'bedroom', name: 'Master Bedroom', icon: '🛏️', basePrice: PRICING_CONSTANTS.ROOM_PRICES.BEDROOM, description: 'Luxurious bedroom retreat' },
+    { id: 'kitchen', name: 'Kitchen', icon: '🍳', basePrice: PRICING_CONSTANTS.ROOM_PRICES.KITCHEN, description: 'Gourmet kitchen renovation' },
+    { id: 'bathroom', name: 'Bathroom', icon: '🛁', basePrice: PRICING_CONSTANTS.ROOM_PRICES.BATHROOM, description: 'Spa-like bathroom design' },
+    { id: 'dining', name: 'Dining Room', icon: '🍽️', basePrice: PRICING_CONSTANTS.ROOM_PRICES.DINING, description: 'Elegant dining experience' },
+    { id: 'office', name: 'Home Office', icon: '💻', basePrice: PRICING_CONSTANTS.ROOM_PRICES.OFFICE, description: 'Productive workspace design' },
+    { id: 'whole-home', name: 'Whole Home', icon: '🏡', basePrice: PRICING_CONSTANTS.ROOM_PRICES.WHOLE_HOME, description: 'Complete home makeover' },
   ]
 
   const roomSizes = [
@@ -46,10 +67,10 @@ export default function CalculatorPage() {
   ]
 
   const budgets = [
-    { id: 'standard', name: 'Standard Premium', multiplier: 0.8, range: '$15K - $40K' },
-    { id: 'luxury', name: 'Luxury Collection', multiplier: 1.0, range: '$40K - $80K' },
-    { id: 'ultra', name: 'Ultra Luxury', multiplier: 1.5, range: '$80K - $150K' },
-    { id: 'bespoke', name: 'Bespoke Excellence', multiplier: 2.0, range: '$150K+' }
+    { id: 'standard', name: 'Standard Premium', multiplier: 0.8, range: formatINRRange(PRICING_CONSTANTS.BUDGET_RANGES.STANDARD.min, PRICING_CONSTANTS.BUDGET_RANGES.STANDARD.max) },
+    { id: 'luxury', name: 'Luxury Collection', multiplier: 1.0, range: formatINRRange(PRICING_CONSTANTS.BUDGET_RANGES.LUXURY.min, PRICING_CONSTANTS.BUDGET_RANGES.LUXURY.max) },
+    { id: 'ultra', name: 'Ultra Luxury', multiplier: 1.5, range: formatINRRange(PRICING_CONSTANTS.BUDGET_RANGES.ULTRA.min, PRICING_CONSTANTS.BUDGET_RANGES.ULTRA.max) },
+    { id: 'bespoke', name: 'Bespoke Excellence', multiplier: 2.0, range: formatINRRange(PRICING_CONSTANTS.BUDGET_RANGES.BESPOKE.min) }
   ]
 
   const materials = [
@@ -59,14 +80,14 @@ export default function CalculatorPage() {
   ]
 
   const furnitureOptions = [
-    { id: 'custom-sofas', name: 'Custom Sofas & Seating', price: 8000 },
-    { id: 'dining-set', name: 'Designer Dining Set', price: 6000 },
-    { id: 'bedroom-suite', name: 'Master Bedroom Suite', price: 12000 },
-    { id: 'custom-storage', name: 'Built-in Storage Solutions', price: 7000 },
-    { id: 'lighting', name: 'Designer Lighting Package', price: 4000 },
-    { id: 'window-treatments', name: 'Custom Window Treatments', price: 3000 },
-    { id: 'artwork', name: 'Curated Art Collection', price: 5000 },
-    { id: 'accessories', name: 'Luxury Accessories Package', price: 2500 }
+    { id: 'custom-sofas', name: 'Custom Sofas & Seating', price: PRICING_CONSTANTS.FURNITURE_PRICES.CUSTOM_SOFAS },
+    { id: 'dining-set', name: 'Designer Dining Set', price: PRICING_CONSTANTS.FURNITURE_PRICES.DINING_SET },
+    { id: 'bedroom-suite', name: 'Master Bedroom Suite', price: PRICING_CONSTANTS.FURNITURE_PRICES.BEDROOM_SUITE },
+    { id: 'custom-storage', name: 'Built-in Storage Solutions', price: PRICING_CONSTANTS.FURNITURE_PRICES.CUSTOM_STORAGE },
+    { id: 'lighting', name: 'Designer Lighting Package', price: PRICING_CONSTANTS.FURNITURE_PRICES.LIGHTING },
+    { id: 'window-treatments', name: 'Custom Window Treatments', price: PRICING_CONSTANTS.FURNITURE_PRICES.WINDOW_TREATMENTS },
+    { id: 'artwork', name: 'Curated Art Collection', price: PRICING_CONSTANTS.FURNITURE_PRICES.ARTWORK },
+    { id: 'accessories', name: 'Luxury Accessories Package', price: PRICING_CONSTANTS.FURNITURE_PRICES.ACCESSORIES }
   ]
 
   const calculatePrice = () => {
@@ -117,6 +138,96 @@ export default function CalculatorPage() {
 
   const currentPrice = calculatePrice()
 
+  // Generate complete quotation data
+  const generateQuotationData = (): { formData: QuotationFormData, calculation: QuotationCalculation } => {
+    const room = roomTypes.find(r => r.id === formData.roomType)
+    const size = roomSizes.find(s => s.id === formData.roomSize)
+    const style = styles.find(st => st.id === formData.style)
+    const budget = budgets.find(b => b.id === formData.budget)
+    const material = materials.find(m => m.id === formData.materials)
+    
+    const basePrice = room ? room.basePrice : 0
+    const sizeMultiplier = size ? size.multiplier : 1
+    const styleMultiplier = style ? style.multiplier : 1
+    const budgetMultiplier = budget ? budget.multiplier : 1
+    const materialMultiplier = material ? material.multiplier : 1
+    
+    const subtotal = basePrice * sizeMultiplier * styleMultiplier * budgetMultiplier * materialMultiplier
+    
+    const selectedFurniture = formData.furniture.map(id => {
+      const furniture = furnitureOptions.find(f => f.id === id)
+      return furniture ? { id: furniture.id, name: furniture.name, price: furniture.price } : null
+    }).filter(Boolean) as Array<{ id: string, name: string, price: number }>
+    
+    const furnitureCost = selectedFurniture.reduce((sum, item) => sum + item.price, 0)
+    const totalPrice = Math.round(subtotal + furnitureCost)
+    
+    const quotationFormData: QuotationFormData = {
+      roomType: formData.roomType,
+      roomSize: formData.roomSize,
+      style: formData.style,
+      budget: formData.budget,
+      materials: formData.materials,
+      furniture: formData.furniture,
+      timeline: formData.timeline || '8-12 weeks',
+      special: formData.special || ''
+    }
+    
+    const calculation: QuotationCalculation = {
+      basePrice,
+      sizeMultiplier,
+      styleMultiplier,
+      budgetMultiplier,
+      materialMultiplier,
+      subtotal: Math.round(subtotal),
+      selectedFurniture,
+      furnitureCost,
+      totalPrice
+    }
+    
+    return { formData: quotationFormData, calculation }
+  }
+
+  // Handle PDF download - Backend implementation
+  const handleDownloadPDF = async () => {
+    try {
+      const { formData: quotationFormData, calculation } = generateQuotationData()
+      
+      // TODO: Replace with actual backend API call to Spring Boot service
+      // Example: POST /api/v1/quotations/pdf with quotation data
+      // const response = await fetch('/api/quotations/pdf', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ formData: quotationFormData, calculation })
+      // })
+      // const blob = await response.blob()
+      // const url = URL.createObjectURL(blob)
+      // const link = document.createElement('a')
+      // link.href = url
+      // link.download = `quotation-${Date.now()}.pdf`
+      // link.click()
+      // URL.revokeObjectURL(url)
+      
+      alert('PDF generation will be available once the backend service is implemented.')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Error generating PDF. Please try again.')
+    }
+  }
+
+  // Handle save quotation
+  const handleSaveQuotation = (name: string, notes?: string) => {
+    try {
+      const { formData: quotationFormData, calculation } = generateQuotationData()
+      const savedQuotation = QuotationStorageService.save(quotationFormData, calculation, name, notes)
+      setSavedQuotations(prev => [savedQuotation, ...prev])
+      setSaveModalOpen(false)
+    } catch (error) {
+      console.error('Error saving quotation:', error)
+      throw error
+    }
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -149,9 +260,9 @@ export default function CalculatorPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="mb-16 text-center"
           >
-            <div className="inline-flex items-center space-x-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center px-4 py-2 mb-4 space-x-2 text-sm font-semibold text-orange-600 bg-orange-100 rounded-full">
               <Sparkles className="w-4 h-4" />
               <span>AI-Powered Price Calculator</span>
             </div>
@@ -164,7 +275,7 @@ export default function CalculatorPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
             
             {/* Progress & Price Display */}
             <motion.div
@@ -174,13 +285,13 @@ export default function CalculatorPage() {
               className="lg:col-span-1"
             >
               {/* Progress Bar */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-                <h3 className="font-heading text-lg font-bold text-blue-900 mb-4">
+              <div className="p-6 mb-6 bg-white shadow-lg rounded-2xl">
+                <h3 className="mb-4 text-lg font-bold text-blue-900 font-heading">
                   Progress ({step}/6)
                 </h3>
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div className="w-full h-3 mb-4 bg-gray-200 rounded-full">
                   <div 
-                    className="bg-gradient-to-r from-yellow-500 to-orange-600 h-3 rounded-full transition-all duration-500"
+                    className="h-3 transition-all duration-500 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600"
                     style={{ width: `${(step / 6) * 100}%` }}
                   />
                 </div>
@@ -202,7 +313,7 @@ export default function CalculatorPage() {
                       {step > item.step ? (
                         <Check className="w-4 h-4" />
                       ) : (
-                        <div className="w-4 h-4 rounded-full border-2 border-current" />
+                        <div className="w-4 h-4 border-2 border-current rounded-full" />
                       )}
                       <span>{item.name}</span>
                     </div>
@@ -211,10 +322,10 @@ export default function CalculatorPage() {
               </div>
 
               {/* Price Display */}
-              <div className="bg-gradient-to-br from-blue-900 to-gray-800 rounded-2xl p-6 text-white sticky top-24">
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center space-x-2 mb-2">
-                    <DollarSign className="w-6 h-6 text-yellow-400" />
+              <div className="sticky p-6 text-white bg-gradient-to-br from-blue-900 to-gray-800 rounded-2xl top-24">
+                <div className="mb-4 text-center">
+                  <div className="flex items-center justify-center mb-2 space-x-2">
+                    <IndianRupee className="w-6 h-6 text-yellow-400" />
                     <span className="text-sm font-medium text-gray-300">Live Estimate</span>
                   </div>
                   <motion.div
@@ -222,9 +333,9 @@ export default function CalculatorPage() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="text-4xl font-bold font-accent text-yellow-400 mb-2"
+                    className="mb-2 text-4xl font-bold text-yellow-400 font-accent"
                   >
-                    ${currentPrice.toLocaleString()}
+                    {formatINR(currentPrice)}
                   </motion.div>
                   <p className="text-xs text-gray-400">
                     *Final price may vary based on customizations
@@ -232,8 +343,8 @@ export default function CalculatorPage() {
                 </div>
 
                 {currentPrice > 0 && (
-                  <div className="border-t border-gray-600 pt-4">
-                    <div className="flex items-center space-x-2 text-yellow-400 mb-3">
+                  <div className="pt-4 border-t border-gray-600">
+                    <div className="flex items-center mb-3 space-x-2 text-yellow-400">
                       <Star className="w-4 h-4 fill-current" />
                       <span className="text-sm font-semibold">Premium Package Includes:</span>
                     </div>
@@ -256,7 +367,7 @@ export default function CalculatorPage() {
               transition={{ duration: 0.8 }}
               className="lg:col-span-2"
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <div className="p-8 bg-white shadow-lg rounded-2xl">
                 
                 {/* Step 1: Room Type */}
                 {step === 1 && (
@@ -267,7 +378,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         What space are you transforming?
                       </h2>
                       <p className="text-gray-600">
@@ -275,7 +386,7 @@ export default function CalculatorPage() {
                       </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {roomTypes.map((room) => (
                         <motion.button
                           key={room.id}
@@ -287,11 +398,11 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="text-3xl mb-3">{room.icon}</div>
-                          <h3 className="font-semibold mb-1">{room.name}</h3>
-                          <p className="text-sm opacity-75 mb-2">{room.description}</p>
+                          <div className="mb-3 text-3xl">{room.icon}</div>
+                          <h3 className="mb-1 font-semibold">{room.name}</h3>
+                          <p className="mb-2 text-sm opacity-75">{room.description}</p>
                           <div className="text-sm font-semibold">
-                            From ${room.basePrice.toLocaleString()}
+                            From {formatINR(room.basePrice)}
                           </div>
                         </motion.button>
                       ))}
@@ -308,7 +419,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         What's the size of your space?
                       </h2>
                       <p className="text-gray-600">
@@ -316,7 +427,7 @@ export default function CalculatorPage() {
                       </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {roomSizes.map((size) => (
                         <motion.button
                           key={size.id}
@@ -328,7 +439,7 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="flex items-center space-x-3 mb-3">
+                          <div className="flex items-center mb-3 space-x-3">
                             <div className="text-2xl">{size.icon}</div>
                             <h3 className="font-semibold">{size.name}</h3>
                           </div>
@@ -350,7 +461,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         What's your design style?
                       </h2>
                       <p className="text-gray-600">
@@ -358,7 +469,7 @@ export default function CalculatorPage() {
                       </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {styles.map((style) => (
                         <motion.button
                           key={style.id}
@@ -370,11 +481,11 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="flex items-center space-x-3 mb-3">
+                          <div className="flex items-center mb-3 space-x-3">
                             <div className="text-2xl">{style.icon}</div>
                             <h3 className="font-semibold">{style.name}</h3>
                           </div>
-                          <p className="text-sm opacity-75 mb-2">{style.description}</p>
+                          <p className="mb-2 text-sm opacity-75">{style.description}</p>
                           <div className="text-sm font-medium">
                             {style.multiplier}x base price
                           </div>
@@ -393,7 +504,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         What's your budget range?
                       </h2>
                       <p className="text-gray-600">
@@ -413,9 +524,9 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="flex justify-between items-center">
+                          <div className="flex items-center justify-between">
                             <div>
-                              <h3 className="font-semibold mb-1">{budget.name}</h3>
+                              <h3 className="mb-1 font-semibold">{budget.name}</h3>
                               <div className="text-sm font-medium">{budget.range}</div>
                             </div>
                             <div className="text-sm">
@@ -437,7 +548,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         Choose your materials & finishes
                       </h2>
                       <p className="text-gray-600">
@@ -457,7 +568,7 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-start justify-between mb-2">
                             <h3 className="font-semibold">{material.name}</h3>
                             <div className="text-sm font-medium">
                               {material.multiplier}x
@@ -479,7 +590,7 @@ export default function CalculatorPage() {
                     animate="visible"
                   >
                     <motion.div variants={itemVariants} className="mb-8">
-                      <h2 className="font-heading text-2xl font-bold text-blue-900 mb-2">
+                      <h2 className="mb-2 text-2xl font-bold text-blue-900 font-heading">
                         Select additional furniture & accessories
                       </h2>
                       <p className="text-gray-600">
@@ -487,7 +598,7 @@ export default function CalculatorPage() {
                       </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {furnitureOptions.map((furniture) => (
                         <motion.button
                           key={furniture.id}
@@ -499,14 +610,14 @@ export default function CalculatorPage() {
                               : 'border-gray-200 hover:border-gray-300 text-gray-700'
                           }`}
                         >
-                          <div className="flex justify-between items-center mb-2">
-                            <h3 className="font-semibold text-sm">{furniture.name}</h3>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-semibold">{furniture.name}</h3>
                             <div className="text-sm font-bold">
                               +${furniture.price.toLocaleString()}
                             </div>
                           </div>
                           {formData.furniture.includes(furniture.id) && (
-                            <div className="flex items-center text-green-600 text-xs">
+                            <div className="flex items-center text-xs text-green-600">
                               <Check className="w-3 h-3 mr-1" />
                               Added to estimate
                             </div>
@@ -518,7 +629,7 @@ export default function CalculatorPage() {
                 )}
 
                 {/* Navigation */}
-                <div className="flex justify-between items-center mt-12 pt-6 border-t">
+                <div className="flex items-center justify-between pt-6 mt-12 border-t">
                   <button
                     onClick={prevStep}
                     disabled={step === 1}
@@ -541,13 +652,90 @@ export default function CalculatorPage() {
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </button>
                   ) : (
-                    <div className="flex space-x-4">
-                      <button className="btn-secondary">
-                        Download Estimate
-                      </button>
-                      <button className="btn-luxury">
-                        Schedule Consultation
-                      </button>
+                    <div className="space-y-4">
+                      {/* Final Quotation Summary */}
+                      <div className="p-6 mb-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
+                        <div className="text-center">
+                          <h3 className="mb-2 text-xl font-bold text-primary-navy">
+                            🎉 Your Interior Design Quote is Ready!
+                          </h3>
+                          <div className="mb-2 text-3xl font-bold text-accent-warm">
+                            {formatINR(currentPrice)}
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Complete design solution for your {formData.roomType?.replace('-', ' ')} space
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <button
+                          onClick={handleDownloadPDF}
+                          disabled={!currentPrice}
+                          className="btn-secondary disabled:opacity-50"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Download PDF
+                        </button>
+                        
+                        <button
+                          onClick={() => setEmailModalOpen(true)}
+                          disabled={!currentPrice}
+                          className="btn-primary disabled:opacity-50"
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          Email Quote
+                        </button>
+                        
+                        <button
+                          onClick={() => setSaveModalOpen(true)}
+                          disabled={!currentPrice}
+                          className="btn-luxury disabled:opacity-50"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Quote
+                        </button>
+                        
+                        <Link
+                          href="/comparison"
+                          className="btn-secondary "
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Compare ({savedQuotations.length})
+                        </Link>
+                      </div>
+
+                      {/* Saved Quotations Preview */}
+                      {savedQuotations.length > 0 && (
+                        <div className="p-4 mt-6 rounded-lg bg-gray-50">
+                          <h4 className="mb-3 font-semibold text-gray-800">
+                            Your Saved Quotations ({savedQuotations.length})
+                          </h4>
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            {savedQuotations.slice(0, 4).map((quotation) => (
+                              <div key={quotation.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900 truncate">
+                                    {quotation.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {formatINR(quotation.calculation.totalPrice)}
+                                  </div>
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                  {new Intl.DateTimeFormat('en-IN').format(quotation.timestamp)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {savedQuotations.length > 4 && (
+                            <Link href="/comparison" className="block mt-2 text-sm font-medium text-accent-gold hover:underline">
+                              View all {savedQuotations.length} saved quotations →
+                            </Link>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -561,7 +749,7 @@ export default function CalculatorPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"
+            className="grid grid-cols-1 gap-8 mt-16 md:grid-cols-3"
           >
             {[
               {
@@ -586,13 +774,13 @@ export default function CalculatorPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-xl p-6 shadow-lg text-center"
+                className="p-6 text-center bg-white shadow-lg rounded-xl"
               >
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-orange-100 rounded-full">
                   <feature.icon className="w-6 h-6 text-orange-600" />
                 </div>
-                <h3 className="font-semibold text-blue-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <h3 className="mb-2 font-semibold text-blue-900">{feature.title}</h3>
+                <p className="text-sm text-gray-600">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -600,6 +788,40 @@ export default function CalculatorPage() {
       </section>
 
       <Footer />
+      
+      {/* Modals */}
+      {step === 6 && currentPrice > 0 && (
+        <>
+          <SaveQuotationModal
+            isOpen={saveModalOpen}
+            onClose={() => setSaveModalOpen(false)}
+            formData={generateQuotationData().formData}
+            calculation={generateQuotationData().calculation}
+            onSaveSuccess={(quotationId) => {
+              const savedQuotations = QuotationStorageService.getSaved()
+              setSavedQuotations(savedQuotations)
+            }}
+          />
+          
+          <EmailShareModal
+            isOpen={emailModalOpen}
+            onClose={() => setEmailModalOpen(false)}
+            quotation={(() => {
+              const data = generateQuotationData()
+              return {
+                id: `temp-${Date.now()}`,
+                name: 'Current Quotation',
+                timestamp: new Date(),
+                formData: data.formData,
+                calculation: data.calculation,
+                clientInfo: createDefaultClientInfo(),
+                status: 'draft' as const,
+                notes: undefined
+              }
+            })()}
+          />
+        </>
+      )}
     </div>
   )
 }

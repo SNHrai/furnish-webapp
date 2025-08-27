@@ -2,42 +2,68 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Sparkles, AlertCircle } from 'lucide-react'
+
+// Validation schema
+const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(50, 'Name is too long'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().optional(),
+  projectType: z.string().min(1, 'Please select a project type'),
+  budget: z.string().optional(),
+  timeline: z.string().optional(),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(1000, 'Message is too long'),
+})
+
+type ContactFormData = z.infer<typeof contactSchema>
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    projectType: '',
-    budget: '',
-    message: '',
-    timeline: ''
-  })
-  
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [formResponseData, setFormResponseData] = useState<any>(null)
+  const [serverError, setServerError] = useState('')
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    getValues
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      projectType: '',
+      budget: '',
+      message: '',
+      timeline: ''
+    }
+  })
 
   const contactInfo = [
     {
       icon: MapPin,
       title: 'Visit Our Showroom',
-      content: '123 Design Street\nLuxury District\nNew York, NY 10001',
+      content: 'Elegant Home Studio\nBandra West\nMumbai, Maharashtra 400050',
       link: 'https://maps.google.com',
       linkText: 'Get Directions'
     },
     {
       icon: Phone,
       title: 'Call Us',
-      content: '+1 (555) 123-4567\nToll Free: +1 (800) 123-4567',
-      link: 'tel:+15551234567',
+      content: '+91 98765 43210\nToll Free: 1800 123 4567',
+      link: 'tel:+919876543210',
       linkText: 'Call Now'
     },
     {
       icon: Mail,
       title: 'Email Us',
-      content: 'hello@eleganthome.com\ninfo@eleganthome.com',
-      link: 'mailto:hello@eleganthome.com',
+      content: 'hello@eleganthome.in\ninfo@eleganthome.in',
+      link: 'mailto:hello@eleganthome.in',
       linkText: 'Send Email'
     },
     {
@@ -59,11 +85,11 @@ export default function ContactSection() {
   ]
 
   const budgetRanges = [
-    'Under $25,000',
-    '$25,000 - $50,000',
-    '$50,000 - $100,000',
-    '$100,000 - $200,000',
-    'Over $200,000'
+    'Under ₹5,00,000',
+    '₹5,00,000 - ₹10,00,000',
+    '₹10,00,000 - ₹25,00,000',
+    '₹25,00,000 - ₹50,00,000',
+    'Over ₹50,00,000'
   ]
 
   const timelines = [
@@ -75,22 +101,36 @@ export default function ContactSection() {
     'Just exploring'
   ]
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const onSubmit = async (data: ContactFormData) => {
+    setServerError('')
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        if (result.errors) {
+          // Handle validation errors from server if any
+          throw new Error(result.message || 'Form submission failed')
+        } else {
+          throw new Error(result.message || 'An unknown error occurred')
+        }
+      }
+      
+      // Success
+      setFormResponseData(result.data)
       setIsSubmitted(true)
-    }, 2000)
+    } catch (error) {
+      console.error('Form submission error:', error)
+      setServerError(error instanceof Error ? error.message : 'Failed to submit form. Please try again.')
+    }
   }
 
   const containerVariants = {
@@ -217,7 +257,7 @@ export default function ContactSection() {
             className="bg-white rounded-2xl p-8 shadow-lg"
           >
             {!isSubmitted ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <div>
                   <h3 className="font-heading text-xl font-bold text-blue-900 mb-6">
                     Tell Us About Your Project
@@ -232,13 +272,16 @@ export default function ContactSection() {
                     </label>
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="form-input"
+                      {...register('name')}
+                      className={`form-input ${errors.name ? 'border-red-500 bg-red-50' : ''}`}
                       placeholder="John Doe"
-                      required
                     />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        {errors.name.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -246,13 +289,16 @@ export default function ContactSection() {
                     </label>
                     <input
                       type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="form-input"
+                      {...register('email')}
+                      className={`form-input ${errors.email ? 'border-red-500 bg-red-50' : ''}`}
                       placeholder="john@example.com"
-                      required
                     />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -263,12 +309,16 @@ export default function ContactSection() {
                   </label>
                   <input
                     type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
+                    {...register('phone')}
                     className="form-input"
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+91 98765 43210"
                   />
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Project Type & Budget Row */}
@@ -278,26 +328,27 @@ export default function ContactSection() {
                       Project Type *
                     </label>
                     <select
-                      name="projectType"
-                      value={formData.projectType}
-                      onChange={handleInputChange}
-                      className="form-select"
-                      required
+                      {...register('projectType')}
+                      className={`form-select ${errors.projectType ? 'border-red-500 bg-red-50' : ''}`}
                     >
                       <option value="">Select project type</option>
                       {projectTypes.map((type) => (
                         <option key={type} value={type}>{type}</option>
                       ))}
                     </select>
+                    {errors.projectType && (
+                      <p className="text-red-500 text-sm mt-1 flex items-center">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        {errors.projectType.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Budget Range
                     </label>
                     <select
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleInputChange}
+                      {...register('budget')}
                       className="form-select"
                     >
                       <option value="">Select budget range</option>
@@ -314,9 +365,7 @@ export default function ContactSection() {
                     Project Timeline
                   </label>
                   <select
-                    name="timeline"
-                    value={formData.timeline}
-                    onChange={handleInputChange}
+                    {...register('timeline')}
                     className="form-select"
                   >
                     <option value="">When would you like to start?</option>
@@ -332,14 +381,17 @@ export default function ContactSection() {
                     Tell us about your vision *
                   </label>
                   <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
+                    {...register('message')}
                     rows={4}
-                    className="form-input resize-none"
+                    className={`form-input resize-none ${errors.message ? 'border-red-500 bg-red-50' : ''}`}
                     placeholder="Describe your dream space, style preferences, specific requirements..."
-                    required
                   />
+                  {errors.message && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      {errors.message.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit Button */}
@@ -365,6 +417,16 @@ export default function ContactSection() {
                   )}
                 </button>
 
+                {/* Server error message */}
+                {serverError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 text-sm">
+                    <div className="flex items-center">
+                      <AlertCircle className="w-5 h-5 mr-2" />
+                      <div>{serverError}</div>
+                    </div>
+                  </div>
+                )}
+                
                 <p className="text-xs text-gray-500 text-center">
                   By submitting this form, you agree to receive communications from us. 
                   We respect your privacy and will never share your information.
@@ -386,11 +448,34 @@ export default function ContactSection() {
                 </p>
                 <div className="bg-green-50 rounded-lg p-4 mb-6">
                   <p className="text-sm text-green-700">
-                    📧 Confirmation email sent to: <strong>{formData.email}</strong>
+                    📧 Confirmation email sent to: <strong>{getValues('email')}</strong>
                   </p>
+                  {formResponseData && formResponseData.submissionId && (
+                    <p className="text-sm text-green-700 mt-2">
+                      🔖 Reference ID: <strong>{formResponseData.submissionId}</strong>
+                    </p>
+                  )}
                 </div>
+                
+                {formResponseData && formResponseData.nextSteps && (
+                  <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+                    <h4 className="font-semibold text-blue-900 mb-2">Next Steps:</h4>
+                    <ul className="text-sm text-blue-800 space-y-2">
+                      {formResponseData.nextSteps.map((step: string, index: number) => (
+                        <li key={index} className="flex items-start">
+                          <CheckCircle className="w-4 h-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                          {step}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 <button
-                  onClick={() => setIsSubmitted(false)}
+                  onClick={() => {
+                    setIsSubmitted(false)
+                    setFormResponseData(null)
+                    reset()
+                  }}
                   className="btn-secondary"
                 >
                   Send Another Message
