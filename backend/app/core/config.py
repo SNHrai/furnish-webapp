@@ -17,8 +17,11 @@ class Settings(BaseSettings):
     # AI Services
     EMERGENT_LLM_KEY: str = os.getenv("EMERGENT_LLM_KEY", "")
     
-    # CORS
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    # CORS - Parse from comma-separated string
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+        return [origin.strip() for origin in origins.split(",")]
     
     # App Settings
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
