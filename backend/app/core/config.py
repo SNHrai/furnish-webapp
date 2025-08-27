@@ -1,0 +1,29 @@
+import os
+from typing import List
+from pydantic import BaseSettings
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Settings(BaseSettings):
+    # Database
+    MONGO_URL: str = os.getenv("MONGO_URL", "mongodb://localhost:27017/interior_design_db")
+    
+    # JWT Settings
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "your-super-secret-jwt-key")
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+    JWT_EXPIRATION_HOURS: int = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
+    
+    # AI Services
+    EMERGENT_LLM_KEY: str = os.getenv("EMERGENT_LLM_KEY", "")
+    
+    # CORS
+    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    
+    # App Settings
+    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+    
+    class Config:
+        case_sensitive = True
+
+settings = Settings()
