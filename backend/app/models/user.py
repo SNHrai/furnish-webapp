@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from datetime import datetime
 from bson import ObjectId
 
@@ -14,15 +14,13 @@ class PyObjectId(ObjectId):
             raise ValueError("Invalid objectid")
         return ObjectId(v)
 
-    @classmethod
-    def __get_pydantic_json_schema__(cls, core_schema: Any, handler: Any) -> dict:
-        return {"type": "string"}
 
 class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
     full_name: str = Field(..., min_length=1, max_length=100)
     phone: Optional[str] = None
+    role: str = "customer"  # One of: customer, designer, admin
     is_active: bool = True
 
 class UserCreate(UserBase):

@@ -15,6 +15,9 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
 @router.post("/register", response_model=UserResponse)
 async def register(user_data: UserCreate):
     """Register a new user"""
@@ -61,6 +64,16 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         )
     
     return auth_service._user_to_response(user.dict())
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """Send password reset email"""
+    # TODO: Implement email sending functionality
+    # For now, just check if user exists
+    user = await auth_service.get_user_by_email(request.email)
+    
+    # Always return success to prevent email enumeration
+    return {"message": "If an account with that email exists, we've sent you a password reset link."}
 
 # Dependency to get current user
 async def get_current_active_user(credentials: HTTPAuthorizationCredentials = Depends(security)):

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Elegant Home</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-message {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 30px;
+        }
+        .features {
+            background-color: #f8fafc;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background-color: #8B5CF6;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+        }
+        .feature-text {
+            color: #4B5563;
+            font-size: 16px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #1F2937;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 10px 0;
+            color: #9CA3AF;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            color: #8B5CF6;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 th:text="${companyName}">Elegant Home</h1>
+            <p>Premium Interior Design Solutions</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="welcome-message">
+                <h2>Welcome, <span th:text="${userName}">User</span>!</h2>
+                <p>Thank you for joining Elegant Home, where your dream interior design comes to life. We're excited to help you transform your space with our AI-powered design solutions and expert craftsmanship.</p>
+            </div>
+
+            <div class="features">
+                <h3 style="color: #374151; margin-top: 0;">What you can do with Elegant Home:</h3>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-text">Get instant AI-powered price calculations for your interior design projects</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-text">Chat with our AI design assistant for personalized recommendations</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-text">Generate detailed quotations and project proposals</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🏡</div>
+                    <div class="feature-text">Explore our portfolio of stunning interior design projects</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📅</div>
+                    <div class="feature-text">Book consultations with our expert design team</div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="#" th:href="${websiteUrl}" class="cta-button">Start Your Design Journey</a>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #E5E7EB;">
+                <h3 style="color: #374151;">Next Steps:</h3>
+                <ol style="color: #6B7280; padding-left: 20px;">
+                    <li>Complete your profile to get personalized design recommendations</li>
+                    <li>Try our AI Price Calculator to estimate your project costs</li>
+                    <li>Browse our portfolio for design inspiration</li>
+                    <li>Schedule a consultation with our design experts</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3 style="margin-top: 0; color: white;">Need Help?</h3>
+            <p>Our support team is here to assist you with any questions.</p>
+            <p>Email: <a href="#" th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}" style="color: #8B5CF6;">support@furnish-webapp.com</a></p>
+            
+            <div class="social-links">
+                <a href="#">Website</a> |
+                <a href="#">Support</a> |
+                <a href="#">Privacy Policy</a>
+            </div>
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #6B7280;">
+                © 2024 <span th:text="${companyName}">Elegant Home</span>. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

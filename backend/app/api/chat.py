@@ -1,22 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from typing import List
 
 from app.models.chat import ChatRequest, ChatResponse, ChatHistory, ChatSession
-from app.models.user import UserInDB
 from app.services.chat_service import ChatService
-from app.api.auth import get_current_active_user
+from app.core.dependencies import get_current_active_user, UserInDB
 
 router = APIRouter()
 chat_service = ChatService()
 
 @router.post("/message", response_model=ChatResponse)
 async def send_message(
-    request: ChatRequest,
+    chat_request: ChatRequest,
+    request: Request,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Send a chat message and get AI response"""
     try:
-        response = await chat_service.process_chat_request(request, current_user)
+        response = await chat_service.process_chat_request(chat_request, current_user)
         return response
     except Exception as e:
         raise HTTPException(
@@ -26,6 +26,7 @@ async def send_message(
 
 @router.get("/sessions", response_model=List[ChatSession])
 async def get_chat_sessions(
+    request: Request,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get all chat sessions for current user"""
@@ -34,6 +35,7 @@ async def get_chat_sessions(
 @router.get("/history/{session_id}", response_model=ChatHistory)
 async def get_chat_history(
     session_id: str,
+    request: Request,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get chat history for a specific session"""
@@ -49,6 +51,7 @@ async def get_chat_history(
 
 @router.post("/session", response_model=ChatSession)
 async def create_chat_session(
+    request: Request,
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Create a new chat session"""

@@ -1,0 +1,15 @@
+com\furnish\webapp\quotationservice\config\SecurityConfig.class
+com\furnish\webapp\quotationservice\controller\AuthController.class
+com\furnish\webapp\quotationservice\dto\ApiResponse.class
+com\furnish\webapp\quotationservice\entity\Quotation$QuotationStatus.class
+com\furnish\webapp\quotationservice\dto\QuotationResponse.class
+com\furnish\webapp\quotationservice\service\AuthService$UserInfo.class
+com\furnish\webapp\quotationservice\repository\QuotationRepository.class
+com\furnish\webapp\quotationservice\dto\QuotationRequest.class
+com\furnish\webapp\quotationservice\service\PdfService.class
+com\furnish\webapp\quotationservice\service\EmailIntegrationService.class
+com\furnish\webapp\quotationservice\service\QuotationService.class
+com\furnish\webapp\quotationservice\entity\Quotation.class
+com\furnish\webapp\quotationservice\config\WebConfig.class
+com\furnish\webapp\quotationservice\QuotationServiceApplication.class
+com\furnish\webapp\quotationservice\service\AuthService.class

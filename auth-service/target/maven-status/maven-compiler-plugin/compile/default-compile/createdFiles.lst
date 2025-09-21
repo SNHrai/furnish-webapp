@@ -1,0 +1,17 @@
+com\furnish\webapp\auth\entity\Role.class
+com\furnish\webapp\auth\security\JwtAuthenticationFilter.class
+com\furnish\webapp\auth\entity\User.class
+com\furnish\webapp\auth\service\AuthService.class
+com\furnish\webapp\auth\dto\TokenResponse.class
+com\furnish\webapp\auth\repository\UserRepository.class
+com\furnish\webapp\auth\service\AuthService$ForgotPasswordRequest.class
+com\furnish\webapp\auth\service\JwtService.class
+com\furnish\webapp\auth\config\OpenApiConfig.class
+com\furnish\webapp\auth\dto\RegisterRequest.class
+com\furnish\webapp\auth\dto\UserResponse.class
+com\furnish\webapp\auth\config\CorsConfig.class
+com\furnish\webapp\auth\dto\LoginRequest.class
+com\furnish\webapp\auth\config\SecurityConfig.class
+com\furnish\webapp\auth\AuthServiceApplication.class
+com\furnish\webapp\auth\service\AuthService$UserUpdateRequest.class
+com\furnish\webapp\auth\controller\AuthController.class

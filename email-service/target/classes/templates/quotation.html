@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Interior Design Quotation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .quotation-summary {
+            background-color: #f8fafc;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 4px solid #8B5CF6;
+        }
+        .quotation-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .quotation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .item-name {
+            font-weight: 600;
+            color: #374151;
+        }
+        .item-value {
+            color: #6B7280;
+        }
+        .total-amount {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .total-amount h3 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #1F2937;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .footer p {
+            margin: 10px 0;
+            color: #9CA3AF;
+        }
+        .disclaimer {
+            background-color: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            color: #92400E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Your Interior Design Quotation</h1>
+            <p>Custom pricing for your dream space</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div>
+                <h2>Hello, <span th:text="${userName}">User</span>!</h2>
+                <p>Thank you for using our AI Price Calculator. Based on your requirements, we've prepared a detailed quotation for your interior design project.</p>
+            </div>
+
+            <div class="quotation-summary">
+                <h3 style="color: #374151; margin-top: 0;">Quotation Summary</h3>
+                
+                <div class="quotation-item">
+                    <span class="item-name">Room Type:</span>
+                    <span class="item-value" th:text="${quotationData.roomType}">Living Room</span>
+                </div>
+                
+                <div class="quotation-item">
+                    <span class="item-name">Room Size:</span>
+                    <span class="item-value" th:text="${quotationData.roomSize}">300 sq ft</span>
+                </div>
+                
+                <div class="quotation-item">
+                    <span class="item-name">Design Style:</span>
+                    <span class="item-value" th:text="${quotationData.designStyle}">Modern</span>
+                </div>
+                
+                <div class="quotation-item">
+                    <span class="item-name">Budget Range:</span>
+                    <span class="item-value" th:text="${quotationData.budgetRange}">₹50,000 - ₹1,00,000</span>
+                </div>
+                
+                <div class="quotation-item">
+                    <span class="item-name">Timeline:</span>
+                    <span class="item-value" th:text="${quotationData.timeline}">4-6 weeks</span>
+                </div>
+                
+                <div class="quotation-item" th:if="${quotationData.services}">
+                    <span class="item-name">Selected Services:</span>
+                    <span class="item-value" th:text="${quotationData.services}">Full Interior Design</span>
+                </div>
+            </div>
+
+            <div class="total-amount">
+                <h3>Estimated Total: <span th:text="${quotationData.totalAmount}">₹85,000</span></h3>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">*Final pricing may vary based on detailed consultation</p>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="#" th:href="${websiteUrl + '/consultation'}" class="cta-button">Book Consultation</a>
+                <br>
+                <a href="#" th:href="${websiteUrl + '/calculator'}" style="color: #8B5CF6; text-decoration: none; margin-top: 10px; display: inline-block;">Modify Your Requirements</a>
+            </div>
+
+            <div class="disclaimer">
+                <h4 style="margin-top: 0; color: #92400E;">Important Notes:</h4>
+                <ul style="margin-bottom: 0; padding-left: 20px;">
+                    <li>This is an AI-generated estimate based on your inputs</li>
+                    <li>Final pricing will be confirmed after detailed consultation</li>
+                    <li>Prices may vary based on material selection and site conditions</li>
+                    <li>This quotation is valid for 30 days from the date of generation</li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #E5E7EB;">
+                <h3 style="color: #374151;">Next Steps:</h3>
+                <ol style="color: #6B7280; padding-left: 20px;">
+                    <li>Review your quotation details above</li>
+                    <li>Book a consultation with our design experts</li>
+                    <li>Discuss material options and finalize the project scope</li>
+                    <li>Receive your final proposal and begin your transformation</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3 style="margin-top: 0; color: white;">Have Questions?</h3>
+            <p>Our team is here to help you bring your vision to life.</p>
+            <p>Email: <a href="#" th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}" style="color: #8B5CF6;">support@furnish-webapp.com</a></p>
+            <p>Phone: +91 9876543210</p>
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #6B7280;">
+                © 2024 <span th:text="${companyName}">Elegant Home</span>. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

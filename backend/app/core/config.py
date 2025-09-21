@@ -1,13 +1,13 @@
 import os
 from typing import List
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class Settings(BaseSettings):
     # Database
-    MONGO_URL: str = os.getenv("MONGO_URL", "mongodb://localhost:27017/interior_design_db")
+    MONGO_URL: str = os.getenv("MONGO_URL", "mongodb://localhost:27017/furnish_webapp")
     
     # JWT Settings
     JWT_SECRET: str = os.getenv("JWT_SECRET", "your-super-secret-jwt-key")

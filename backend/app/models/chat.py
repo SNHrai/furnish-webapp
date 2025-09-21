@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Literal, Any
+from typing import Optional, List, Union, Any
 from datetime import datetime
 from bson import ObjectId
 
@@ -14,15 +14,12 @@ class PyObjectId(ObjectId):
             raise ValueError("Invalid objectid")
         return ObjectId(v)
 
-    @classmethod
-    def __get_pydantic_json_schema__(cls, core_schema: Any, handler: Any) -> dict:
-        return {"type": "string"}
 
 class ChatMessage(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     session_id: str
     user_id: str
-    message_type: Literal["user", "assistant", "system"] = "user"
+    message_type: str = "user"  # One of: user, assistant, system
     content: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     metadata: Optional[dict] = None
